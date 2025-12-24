@@ -1,6 +1,6 @@
 module github.com/google/cadvisor
 
-go 1.23.0
+go 1.24.0
 
 toolchain go1.25.5
 
@@ -86,3 +86,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gotest.tools/v3 v3.0.2 // indirect
 )
+
+replace github.com/opencontainers/cgroups => github.com/sambhav-jain-16/cgroups v0.0.0-20260113145247-5a20778610e6

@@ -83,13 +83,25 @@ func (h *Handler) GetStats() (*info.ContainerStats, error) {
 		}
 	}
 
-	cgroupStats, err := h.cgroupManager.GetStats()
+	controllers := cgroups.CPU | cgroups.Memory | cgroups.Pids
+
+	if h.includedMetrics.Has(container.DiskIOMetrics) {
+		controllers |= cgroups.IO
+	}
+	if h.includedMetrics.Has(container.HugetlbUsageMetrics) {
+		controllers |= cgroups.HugeTLB
+	}
+
+	cgroupStats, err := h.cgroupManager.Stats(&cgroups.StatsOptions{
+		Controllers: controllers,
+	})
 	if err != nil {
 		if !ignoreStatsError {
 			return nil, err
 		}
 		klog.V(4).Infof("Ignoring errors when gathering stats for root cgroup since some controllers don't have stats on the root cgroup: %v", err)
 	}
+
 	stats := newContainerStats(cgroupStats, h.includedMetrics)
 
 	if h.includedMetrics.Has(container.ProcessSchedulerMetrics) {
